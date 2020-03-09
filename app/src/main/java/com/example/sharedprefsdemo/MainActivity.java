@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
 
         loadPrefs(); //see method below
 
+        //Adding a comment here!!!!!!!!!!!!!!!!!!!!!!
+
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
