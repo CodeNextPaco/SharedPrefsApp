@@ -15,6 +15,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button saveBtn;
@@ -25,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private Switch notifSwitch;
     private ConstraintLayout background;
 
+    private TextView outputTV;
+
+    //labels needed for dark mode
     private TextView emailLabel;
     private TextView titleLabel;
     private TextView phoneLabel;
@@ -40,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String PHONE_KEY = "phoneKey";
     public static final String DARK_MODE_KEY = "darkModeKey";
     public static final String NOTIFS_KEY = "notifsKey";
+    public static final String PREVIOUS_KEY = "previousKey";
+
+    public List<String> previousSettignsList;
 
     boolean isDarkMode = false;
     boolean showNotifs = true;
@@ -54,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
         saveBtn = findViewById(R.id.saveBtn);
         nameField = findViewById(R.id.nameTxt);
         emailField = findViewById(R.id.emailTxt);
@@ -63,18 +76,26 @@ public class MainActivity extends AppCompatActivity {
         background = findViewById(R.id.background);
 
 
+
+
         emailLabel = findViewById(R.id.emailLblTV);
         phoneLabel = findViewById(R.id.phoneLblTV);
         nameLabel = findViewById(R.id.nameLblTV);
         titleLabel = findViewById(R.id.titleTxtView);
         infoLabel = findViewById(R.id.infoTV);
 
+        //************* output text view to hold previous profiles. ************
+        outputTV = findViewById(R.id.outputTV);
+        outputTV.setText("");
 
+        // To save Collection data, like arrays, we need to convert to a List to a Set.
+        // Here we declare the new List that we will load and update.
+        previousSettignsList = new ArrayList<String>();
 
 
         loadPrefs(); //see method below
 
-        //Adding a comment here!!!!!!!!!!!!!!!!!!!!!!
+
 
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -123,11 +144,25 @@ public class MainActivity extends AppCompatActivity {
             showNotifs = sharedpreferences.getBoolean(NOTIFS_KEY, true);
             notifSwitch.setChecked(showNotifs);
         }
+        //******** Added a new condition for the Previous key
+        if(sharedpreferences.contains(PREVIOUS_KEY)){
+
+
+            //******** Create a new Set for our saved data and pass its items to our List.
+            Set<String> set = sharedpreferences.getStringSet(PREVIOUS_KEY, null);
+
+            for (String item : set){
+
+                previousSettignsList.add(item);
+                outputTV.append(item); //print out the entries
+            }
+
+            Log.d("loadPrefs", ""+ set);
+
+        }
     }
 
     private void saveSettings(){
-
-        Log.d("saveSettings" , "settings Saved.");
 
         SharedPreferences.Editor editor = sharedpreferences.edit();
 
@@ -135,10 +170,21 @@ public class MainActivity extends AppCompatActivity {
         String email = emailField.getText().toString();
         String phone = phoneField.getText().toString();
 
+        //******** Store a full string, with a line break
+        String fullContact = name + " " + email + " " + phone + "\n";
+
+        //******** Store a full string, with a line break Shared prefs can only store a Set of strings, not arrays or list, but we can convert them to a Set as below:
+        Set<String> set = new HashSet<String>();
+        previousSettignsList.add(fullContact);
+         set.addAll(previousSettignsList);
+
 
         editor.putString(NAME_KEY, name);
         editor.putString(EMAIL_KEY, email);
         editor.putString(PHONE_KEY, phone);
+
+        //******** Store a full string, with a line break add the Key/Value pair for the previous user
+        editor.putStringSet(PREVIOUS_KEY, set);
 
         isDarkMode= darkmodeSwitch.isChecked();
         editor.putBoolean(DARK_MODE_KEY, isDarkMode);
@@ -172,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             nameLabel.setTextColor(getResources().getColor(R.color.lightText));
             infoLabel.setTextColor(getResources().getColor(R.color.lightText));
             titleLabel.setTextColor(getResources().getColor(R.color.lightText));
+            outputTV.setTextColor(getResources().getColor(R.color.lightText));
 
             emailField.setTextColor(getResources().getColor(R.color.lightText));
             phoneField.setTextColor(getResources().getColor(R.color.lightText));
@@ -190,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
             nameLabel.setTextColor(getResources().getColor(R.color.darkText));
             infoLabel.setTextColor(getResources().getColor(R.color.darkText));
             titleLabel.setTextColor(getResources().getColor(R.color.darkText));
+            outputTV.setTextColor(getResources().getColor(R.color.darkText));
 
             emailField.setTextColor(getResources().getColor(R.color.darkText));
             phoneField.setTextColor(getResources().getColor(R.color.darkText));
