@@ -9,7 +9,7 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/titleTxtView"d
+        android:id="@+id/titleTxtView"
         android:layout_width="142dp"
         android:layout_height="27dp"
         android:layout_marginTop="40dp"
